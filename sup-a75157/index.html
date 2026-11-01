@@ -51,7 +51,7 @@ const API='https://ntfy.sh/'+BIN;let lastSnap=0;
 let CNOTES=[];
 function cnRender(n){const xs=CNOTES.filter(c=>!n||c.n===n).sort((a,b)=>b.t-a.t);return xs.length?xs.map(c=>`<div class="cn"><div>${esc(c.txt)}</div><div class="w meta">${esc(c.by||'AA Cleaning')} · ${c.n?'#'+esc(c.n)+' · ':''}${tm(c.t)}</div></div>`).join(''):'<div class="meta">No client notes yet.</div>'}
 
-const SUPS=['Janine Richardson','Eduardo Ednardo','Alan','David'];
+const SUPS=['Allan Fonseca','Andrew Silva','David Rosario','Ednardo Maipira da Silva','Eduardo Vela','Janine Goncalves','Richardson Cardoso'];
 // Checklist config: add client-facing items here later.
 const SECTIONS=[
  {t:'Delivery & setup',items:[['pads','Pads delivered'],['supplies','Supplies dropped off'],['machines','Machines checked']]},
@@ -74,7 +74,7 @@ async function load(){try{const r=await fetch(API+'/json?poll=1&since=all&_='+Da
 async function setF(n,f,v){if(!EDIT)return;if(!me){toast('Tap your name first');return}
  const val={v,by:me,t:Date.now()};DB.stores[n]=DB.stores[n]||{};DB.stores[n][f]=val;render();
  try{const r=await fetch(API,{method:'POST',body:JSON.stringify({n,f,val})});if(!r.ok)throw 0;toast('Saved')}catch(e){toast('Save failed — retry')}}
-function who(){const w=document.getElementById('who');if(!w)return;w.innerHTML='<div class="sec" style="margin-top:0">I am</div><div class="row">'+SUPS.map(s=>`<button class="pill ${s===me?'on':''}" onclick="pick('${s}')">${esc(s)}</button>`).join('')+'</div>'}
+function who(){const w=document.getElementById('who');if(!w)return;w.innerHTML='<div class="sec" style="margin-top:0">I am</div><select style="font:600 16px Inter;padding:8px;width:100%;border-radius:10px" onchange="pick(this.value)"><option value="">—</option>'+SUPS.map(s=>`<option ${s===me?'selected':''} value="${esc(s)}">${esc(s)}</option>`).join('')+'</select>'}
 function pick(s){me=s;localStorage.setItem('ssaa_sup',s);who();render();toast('Signed as '+s)}
 function render(){
  const T=STORES.filter(s=>tonight(s.n));const tot=T.length*ALL.length;const done=T.reduce((a,s)=>a+pr(s.n),0);
