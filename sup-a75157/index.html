@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Stop & Shop × AA Cleaning Startup — Nov 1, 2026</title>
+<title>NES Launch Board — Stop &amp; Shop × AA Cleaning Startup</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -34,7 +34,7 @@ td{padding:8px;border-bottom:1px solid var(--line);vertical-align:top}.dot{displ
 .toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#0f172a;color:#fff;padding:9px 14px;border-radius:10px;font-size:13px;opacity:0;transition:.3s;z-index:3000}.toast.s{opacity:1}
 .tbl{overflow:auto;max-height:70vh}
 </style></head><body>
-<header><div class="wrap" style="padding:0"><div class="brand">Stop & Shop <span>×</span> AA Cleaning Startup</div><div class="sub">November 1, 2026 · Supervisor check-in · <span id="upd">loading…</span></div></div></header>
+<header><div class="wrap" style="padding:0"><div class="brand">NES Launch Board</div><div class="sub">Stop &amp; Shop × AA Cleaning Startup · November 1, 2026 · Supervisor check-in · <span id="upd">loading…</span></div></div></header>
 <div class="wrap">
 <div class="card" id="who"></div>
 <div class="card row"><div class="stat"><div>Stores starting tonight</div><b id="sT">–</b></div><div class="stat"><div>Fully ready</div><b id="sR">–</b></div><div class="stat"><div>Overall progress</div><b id="sP">–</b><div class="bar" style="margin-top:6px"><i id="sB" style="width:0"></i></div></div></div>
@@ -92,7 +92,7 @@ function det(n,re){open=n;const s=STORES.find(x=>x.n===n),d=sd(n);const ae=docum
 function cls(){open=null;modal.style.display='none'}modal.onclick=e=>{if(e.target===modal)cls()};
 document.getElementById('q').oninput=render;
 const map=L.map('map',{scrollWheelZoom:false}).setView([41.85,-70.7],9);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',maxZoom:18}).addTo(map);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap contributors',maxZoom:18}).addTo(map);
 STORES.forEach(s=>{markers[s.n]=L.circleMarker([s.lat,s.lng],{radius:8,weight:2,color:'#fff',fillColor:'#e11d2e',fillOpacity:1}).addTo(map).bindTooltip('#'+s.n+' '+s.c,{permanent:true,direction:'right',className:'lbl',offset:[8,0]}).on('click',()=>det(s.n))});
 map.fitBounds(STORES.map(s=>[s.lat,s.lng]),{padding:[20,20]});
 who();load();setInterval(load,EDIT?8000:5000);
