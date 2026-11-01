@@ -1,0 +1,68 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>NES Launch Board — Stop &amp; Shop × AA Cleaning Startup</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--line:#e2e8f0;--mut:#475569}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:#f5f7fa;color:#0f172a}
+header{background:linear-gradient(135deg,#0b3d2a,#0b6b3a);color:#fff;padding:18px}
+.brand{font-weight:800;font-size:26px}.sub{font-weight:600;font-size:15px;margin-top:4px;opacity:.9}
+.wrap{max-width:1200px;margin:0 auto;padding:14px}
+.stats{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px}.stat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 16px;font-weight:700;font-size:15px}.stat b{display:block;font-size:28px}
+.legend{font-weight:700;font-size:15px;margin:6px 0 12px}.legend span{margin-right:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.tile{background:#fff;border:1px solid var(--line);border-left:10px solid #dc2626;border-radius:14px;padding:14px;cursor:pointer;text-align:left;font:inherit;color:inherit;width:100%}
+.tile.amber{border-left-color:#f59e0b}.tile.green{border-left-color:#16a34a}
+.tile .num{font-size:22px;font-weight:800}.tile .town{font-size:18px;font-weight:700}.tile .area{font-size:13px;color:var(--mut);font-weight:600}
+.st{display:inline-block;margin-top:8px;padding:4px 10px;border-radius:999px;font-weight:800;font-size:14px;color:#fff;background:#dc2626}.amber .st{background:#f59e0b}.green .st{background:#16a34a}
+.bar{height:12px;background:#e2e8f0;border-radius:99px;margin-top:10px;overflow:hidden}.bar i{display:block;height:100%;background:#0b6b3a}
+.cnt{font-weight:800;font-size:17px;margin-top:6px}
+#modal{position:fixed;inset:0;background:rgba(15,23,42,.5);display:none;z-index:9;align-items:flex-start;justify-content:center;overflow-y:auto;padding:16px}
+.sheet{background:#fff;border-radius:16px;max-width:680px;width:100%;padding:18px}
+.sheet h2{margin:0;font-size:24px}.sec{font-weight:800;font-size:16px;margin:16px 0 4px;color:#0b6b3a;text-transform:uppercase}
+.item{padding:10px 0;border-bottom:1px solid var(--line)}.item label{display:flex;gap:12px;align-items:center;font-weight:700;font-size:17px}
+.item input[type=checkbox]{width:26px;height:26px}.w{font-size:13px;color:var(--mut);margin-left:38px}
+.item.done label{color:#15803d}
+input.nt,textarea{width:100%;font:15px Inter;padding:8px;border:1px solid var(--line);border-radius:8px;margin-top:6px}
+.close{float:right;font:800 16px Inter;padding:8px 14px;border-radius:10px;border:0;background:#0f172a;color:#fff;cursor:pointer}
+.note{font-size:14px;color:var(--mut);font-weight:600;margin-top:16px}
+</style></head><body>
+<div style="background:#fff;border-bottom:1px solid #e2e8f0;padding:18px 0;text-align:center"><img src="../nes-logo.png" alt="NES" style="height:84px;max-width:80%"></div>
+<header><div class="wrap" style="padding:0"><div class="brand">NES Launch Board</div><div class="sub">Client: AA Cleaning · Account: Stop &amp; Shops · Startup dashboard · <span id="upd">loading…</span></div></div></header>
+<div class="wrap">
+<div class="stats"><div class="stat">Stores<b id="sN">34</b></div><div class="stat">Ready<b id="sG">–</b></div><div class="stat">In progress<b id="sA">–</b></div><div class="stat">Not started<b id="sR">–</b></div></div>
+<div class="legend"><span style="color:#16a34a">● Ready (15/15)</span><span style="color:#d97706">● In progress</span><span style="color:#dc2626">● Not started (0/15)</span></div>
+<div class="grid" id="grid"></div>
+<p class="note">Status loads from the live supervisor Launch Board. Ticks and notes you make on this page are saved in this browser only (localStorage) and are not shared with others.</p>
+</div>
+<div id="modal" onclick="if(event.target===this)cls()"><div class="sheet" id="sheet"></div></div>
+<script>
+const STORES=[{"n": "2417", "c": "Bourne", "s": "MA", "a": "Cape Cod & Islands"}, {"n": "461", "c": "Dennis", "s": "MA", "a": "Cape Cod & Islands"}, {"n": "422", "c": "Edgartown", "s": "MA", "a": "Cape Cod & Islands"}, {"n": "425", "c": "Falmouth", "s": "MA", "a": "Cape Cod & Islands"}, {"n": "475", "c": "Harwich", "s": "MA", "a": "Cape Cod & Islands"}, {"n": "406", "c": "Hyannis", "s": "MA", "a": "Cape Cod & Islands"}, {"n": "66", "c": "Marstons Mills", "s": "MA", "a": "Cape Cod & Islands"}, {"n": "87", "c": "Mashpee", "s": "MA", "a": "Cape Cod & Islands"}, {"n": "2413", "c": "Nantucket", "s": "MA", "a": "Cape Cod & Islands"}, {"n": "2415", "c": "Nantucket", "s": "MA", "a": "Cape Cod & Islands"}, {"n": "64", "c": "Orleans", "s": "MA", "a": "Cape Cod & Islands"}, {"n": "2403", "c": "Provincetown", "s": "MA", "a": "Cape Cod & Islands"}, {"n": "2422", "c": "S. Yarmouth", "s": "MA", "a": "Cape Cod & Islands"}, {"n": "470", "c": "Sandwich", "s": "MA", "a": "Cape Cod & Islands"}, {"n": "12", "c": "Sandwich", "s": "MA", "a": "Cape Cod & Islands"}, {"n": "22", "c": "South Yarmouth", "s": "MA", "a": "Cape Cod & Islands"}, {"n": "423", "c": "Vineyard Haven", "s": "MA", "a": "Cape Cod & Islands"}, {"n": "54", "c": "Abington", "s": "MA", "a": "South Shore / Attleboro"}, {"n": "432", "c": "Attleboro", "s": "MA", "a": "South Shore / Attleboro"}, {"n": "443", "c": "Attleboro", "s": "MA", "a": "South Shore / Attleboro"}, {"n": "430", "c": "Bellingham", "s": "MA", "a": "South Shore / Attleboro"}, {"n": "478", "c": "Braintree", "s": "MA", "a": "South Shore / Attleboro"}, {"n": "482", "c": "Cohasset", "s": "MA", "a": "South Shore / Attleboro"}, {"n": "487", "c": "East Weymouth", "s": "MA", "a": "South Shore / Attleboro"}, {"n": "494", "c": "Foxboro", "s": "MA", "a": "South Shore / Attleboro"}, {"n": "35", "c": "Hingham", "s": "MA", "a": "South Shore / Attleboro"}, {"n": "7", "c": "Mansfield", "s": "MA", "a": "South Shore / Attleboro"}, {"n": "490", "c": "North Attleboro", "s": "MA", "a": "South Shore / Attleboro"}, {"n": "28", "c": "Norwell", "s": "MA", "a": "South Shore / Attleboro"}, {"n": "462", "c": "Plainville", "s": "MA", "a": "South Shore / Attleboro"}, {"n": "2404", "c": "Seekonk", "s": "MA", "a": "South Shore / Attleboro"}, {"n": "33", "c": "Stoughton", "s": "MA", "a": "South Shore / Attleboro"}, {"n": "44", "c": "Walpole", "s": "MA", "a": "South Shore / Attleboro"}, {"n": "444", "c": "Whitman", "s": "MA", "a": "South Shore / Attleboro"}];
+const SECTIONS=[
+ {t:'Delivery & setup',items:[['pads','Pads delivered'],['supplies','Supplies dropped off'],['machines','Machines checked']]},
+ {t:'On site',items:[['on_pm','On site this afternoon'],['on_night','On site later tonight']]},
+ {t:'Training',items:[['ivr','IVR training done'],['mtrain','Machine training done'],['sow','Scope of work training done'],['uniform','Uniform training done']]},
+ {t:'Equipment on site',items:[['e_buffer','Buffer'],['e_propane','Propane'],['e_chem','Chemicals'],['e_pads','Pads'],['e_mops','Dry mops'],['e_tools','Tools']]}];
+const ALL=SECTIONS.flatMap(s=>s.items);const TOT=ALL.length;
+const API='https://ntfy.sh/ssaa-acaa197224d58041';
+let LIVE={stores:{}};let LOC=JSON.parse(localStorage.getItem('nes_board')||'{}');let open=null;
+const esc=s=>String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function val(n,id){const l=(LOC[n]||{})[id];const r=(LIVE.stores[n]||{})[id];if(l&&(!r||l.t>=r.t))return l;return r}
+function done(n){return ALL.filter(([id])=>{const x=val(n,id);return x&&x.v}).length}
+function save(){localStorage.setItem('nes_board',JSON.stringify(LOC))}
+function setL(n,k,v){LOC[n]=LOC[n]||{};LOC[n][k]={v,t:Date.now(),by:'this browser'};save();render()}
+function render(){let g=0,a=0,r=0;document.getElementById('grid').innerHTML=STORES.map(s=>{const d=done(s.n);const c=d===TOT?'green':d?'amber':'';c==='green'?g++:c?a++:r++;
+ return `<button class="tile ${c}" onclick="show('${s.n}')"><div class="num">#${s.n}</div><div class="town">${esc(s.c)}, ${s.s}</div><div class="area">${esc(s.a)}</div><span class="st">${d===TOT?'Ready':d?'In progress':'Not started'}</span><div class="bar"><i style="width:${d/TOT*100}%"></i></div><div class="cnt">${d}/${TOT}</div></button>`}).join('');
+ sG.textContent=g;sA.textContent=a;sR.textContent=r;if(open)drawSheet()}
+function show(n){open=n;drawSheet();modal.style.display='flex'}
+function cls(){open=null;modal.style.display='none'}
+function drawSheet(){const n=open,s=STORES.find(x=>x.n===n);const d=done(n);let h=`<button class="close" onclick="cls()">Close</button><h2>#${n} ${esc(s.c)}, ${s.s}</h2><div class="cnt">${d}/${TOT} checked</div>`;
+ SECTIONS.forEach(sec=>{h+=`<div class="sec">${sec.t}</div>`;sec.items.forEach(([id,l])=>{const x=val(n,id),nt=val(n,'n_'+id);h+=`<div class="item ${x&&x.v?'done':''}"><label><input type="checkbox" ${x&&x.v?'checked':''} onchange="setL('${n}','${id}',this.checked)">${l} — ${x&&x.v?'✓ Checked':'Not checked'}</label>${x&&x.by?`<div class="w">${esc(x.by)} · ${new Date(x.t).toLocaleString()}</div>`:''}<input class="nt" placeholder="Notes for this item" value="${esc(nt&&nt.v)}" onchange="setL('${n}','n_${id}',this.value)"></div>`})});
+ const sn=val(n,'note');h+=`<div class="sec">Store notes</div><textarea rows="3" onchange="setL('${n}','note',this.value)">${esc(sn&&sn.v)}</textarea>`;
+ sheet.innerHTML=h}
+async function load(){try{const r=await fetch(API+'/json?poll=1&since=all&_='+Date.now(),{cache:'no-store'});const tx=await r.text();
+ const ms=tx.split('\n').filter(Boolean).map(l=>{try{const o=JSON.parse(l);return o.event==='message'?JSON.parse(o.message):null}catch(e){return null}}).filter(Boolean);
+ let db={stores:{}},si=-1;ms.forEach((m,i)=>{if(m.snap)si=i});if(si>=0)db=JSON.parse(JSON.stringify(ms[si].snap));
+ ms.forEach((m,i)=>{if(i<=si||!m.n||!m.f)return;const s=db.stores[m.n]=db.stores[m.n]||{};if(!s[m.f]||s[m.f].t<=m.val.t)s[m.f]=m.val});
+ LIVE=db;upd.textContent='Live · updated '+new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});if(!open||!document.activeElement||document.activeElement.tagName!=='INPUT'&&document.activeElement.tagName!=='TEXTAREA')render()}catch(e){upd.textContent='Live data unavailable — showing saved state'}}
+render();load();setInterval(load,30000);
+</script></body></html>
