@@ -1,0 +1,94 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Stop & Shop × AA Cleaning Startup — Nov 1, 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{--bg:#f5f7fa;--card:#fff;--ink:#0f172a;--mut:#64748b;--line:#e2e8f0;--brand:#0b6b3a;--brand2:#e11d2e;--ok:#16a34a;--warn:#f59e0b;--sh:0 1px 2px rgba(15,23,42,.04),0 4px 16px rgba(15,23,42,.06)}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
+header{background:linear-gradient(135deg,#0b3d2a,#0b6b3a);color:#fff;padding:18px 18px 22px}
+.brand{font-weight:800;font-size:19px;letter-spacing:-.02em}.brand span{color:#fca5a5}.sub{opacity:.8;font-size:13px;margin-top:3px}
+.wrap{max-width:1100px;margin:0 auto;padding:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--sh);padding:14px;margin-bottom:12px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.pill{border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 14px;font:600 14px Inter;cursor:pointer;color:var(--ink)}
+.pill.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+.stat{flex:1;min-width:120px}.stat b{font-size:24px;letter-spacing:-.02em}.stat div{color:var(--mut);font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.05em}
+.bar{height:8px;background:#eef2f6;border-radius:9px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,#16a34a,#22c55e)}
+#map{height:360px;border-radius:14px;border:1px solid var(--line);box-shadow:var(--sh);margin-bottom:12px}
+.lbl{background:#fff;border:1px solid var(--line);border-radius:6px;font:600 11px Inter;padding:2px 6px;box-shadow:var(--sh);white-space:nowrap}
+input[type=search],textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px 12px;font:500 15px Inter;background:#fff}
+.store{cursor:pointer}.store h3{margin:0;font-size:16px;letter-spacing:-.01em}.meta{color:var(--mut);font-size:12.5px}
+.tag{font:600 11px Inter;padding:3px 8px;border-radius:999px;background:#eef2f6;color:var(--mut)}.tag.g{background:#dcfce7;color:#166534}.tag.r{background:#fee2e2;color:#991b1b}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.item{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:11px 2px;border-bottom:1px solid var(--line)}
+.item:last-child{border:0}.item .w{font-size:11.5px;color:var(--mut)}
+.chk{width:26px;height:26px;accent-color:var(--brand)}
+.sec{font:700 11px Inter;text-transform:uppercase;letter-spacing:.08em;color:var(--mut);margin:14px 0 4px}
+#modal{position:fixed;inset:0;background:rgba(15,23,42,.45);display:none;z-index:2000;align-items:flex-end;justify-content:center}
+#modal .sheet{background:#fff;width:100%;max-width:640px;max-height:92vh;overflow:auto;border-radius:18px 18px 0 0;padding:18px}
+@media(min-width:700px){#modal{align-items:center}#modal .sheet{border-radius:18px}}
+.x{float:right;border:0;background:#eef2f6;border-radius:999px;width:34px;height:34px;font-size:18px;cursor:pointer}
+table{width:100%;border-collapse:collapse;font-size:13px}th{text-align:left;color:var(--mut);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.05em;padding:8px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff}
+td{padding:8px;border-bottom:1px solid var(--line);vertical-align:top}.dot{display:inline-block;width:9px;height:9px;border-radius:9px;background:#cbd5e1}.dot.on{background:var(--ok)}
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#0f172a;color:#fff;padding:9px 14px;border-radius:10px;font-size:13px;opacity:0;transition:.3s;z-index:3000}.toast.s{opacity:1}
+.tbl{overflow:auto;max-height:70vh}
+</style></head><body>
+<header><div class="wrap" style="padding:0"><div class="brand">Stop & Shop <span>×</span> AA Cleaning Startup</div><div class="sub">November 1, 2026 · Supervisor check-in · <span id="upd">loading…</span></div></div></header>
+<div class="wrap">
+<div class="card" id="who"></div>
+<div class="card row"><div class="stat"><div>Stores starting tonight</div><b id="sT">–</b></div><div class="stat"><div>Fully ready</div><b id="sR">–</b></div><div class="stat"><div>Overall progress</div><b id="sP">–</b><div class="bar" style="margin-top:6px"><i id="sB" style="width:0"></i></div></div></div>
+<div id="map"></div>
+<div class="card"><input type="search" id="q" placeholder="Search store # or town…"><div class="row" style="margin-top:10px" id="flt"></div></div>
+<div id="list" class="grid"></div>
+
+</div>
+<div id="modal"><div class="sheet" id="sheet"></div></div><div class="toast" id="toast"></div>
+<script>
+const EDIT=true;const KEY="7b33cc660c8f185ee1aafab0";const BIN='bcfbecf';const STORES=[{"n": "2417", "c": "Bourne", "s": "MA", "a": "Cape Cod & Islands", "lat": 41.7703, "lng": -70.54003, "geo": "store-name"}, {"n": "461", "c": "Dennis", "s": "MA", "a": "Cape Cod & Islands", "lat": 41.69534, "lng": -70.15035, "geo": "store-name"}, {"n": "422", "c": "Edgartown", "s": "MA", "a": "Cape Cod & Islands", "lat": 41.39387, "lng": -70.52506, "geo": "store-name"}, {"n": "425", "c": "Falmouth", "s": "MA", "a": "Cape Cod & Islands", "lat": 41.56224, "lng": -70.59873, "geo": "store-name"}, {"n": "475", "c": "Harwich", "s": "MA", "a": "Cape Cod & Islands", "lat": 41.67041, "lng": -70.06003, "geo": "approx"}, {"n": "406", "c": "Hyannis", "s": "MA", "a": "Cape Cod & Islands", "lat": 41.67582, "lng": -70.30709, "geo": "address"}, {"n": "66", "c": "Marstons Mills", "s": "MA", "a": "Cape Cod & Islands", "lat": 41.64801, "lng": -70.42366, "geo": "address"}, {"n": "87", "c": "Mashpee", "s": "MA", "a": "Cape Cod & Islands", "lat": 41.61922, "lng": -70.48924, "geo": "approx"}, {"n": "2413", "c": "Nantucket", "s": "MA", "a": "Cape Cod & Islands", "lat": 41.28335, "lng": -70.09636, "geo": "address"}, {"n": "2415", "c": "Nantucket", "s": "MA", "a": "Cape Cod & Islands", "lat": 41.27212, "lng": -70.09207, "geo": "address"}, {"n": "64", "c": "Orleans", "s": "MA", "a": "Cape Cod & Islands", "lat": 41.79626, "lng": -69.98499, "geo": "store-name"}, {"n": "2403", "c": "Provincetown", "s": "MA", "a": "Cape Cod & Islands", "lat": 42.05058, "lng": -70.19635, "geo": "address"}, {"n": "2422", "c": "S. Yarmouth", "s": "MA", "a": "Cape Cod & Islands", "lat": 41.68614, "lng": -70.20879, "geo": "address"}, {"n": "470", "c": "Sandwich", "s": "MA", "a": "Cape Cod & Islands", "lat": 41.7445, "lng": -70.4672, "geo": "approx"}, {"n": "12", "c": "Sandwich", "s": "MA", "a": "Cape Cod & Islands", "lat": 41.76646, "lng": -70.50984, "geo": "store-name"}, {"n": "22", "c": "South Yarmouth", "s": "MA", "a": "Cape Cod & Islands", "lat": 41.65809, "lng": -70.20765, "geo": "address"}, {"n": "423", "c": "Vineyard Haven", "s": "MA", "a": "Cape Cod & Islands", "lat": 41.45443, "lng": -70.60175, "geo": "store-name"}, {"n": "54", "c": "Abington", "s": "MA", "a": "South Shore / Attleboro", "lat": 42.1103, "lng": -70.93012, "geo": "store-name"}, {"n": "432", "c": "Attleboro", "s": "MA", "a": "South Shore / Attleboro", "lat": 41.95103, "lng": -71.2733, "geo": "approx"}, {"n": "443", "c": "Attleboro", "s": "MA", "a": "South Shore / Attleboro", "lat": 41.92386, "lng": -71.3587, "geo": "address"}, {"n": "430", "c": "Bellingham", "s": "MA", "a": "South Shore / Attleboro", "lat": 42.01944, "lng": -71.49811, "geo": "address"}, {"n": "478", "c": "Braintree", "s": "MA", "a": "South Shore / Attleboro", "lat": 42.19098, "lng": -70.98656, "geo": "address"}, {"n": "482", "c": "Cohasset", "s": "MA", "a": "South Shore / Attleboro", "lat": 42.23344, "lng": -70.82042, "geo": "address"}, {"n": "487", "c": "East Weymouth", "s": "MA", "a": "South Shore / Attleboro", "lat": 42.2013, "lng": -70.94553, "geo": "address"}, {"n": "494", "c": "Foxboro", "s": "MA", "a": "South Shore / Attleboro", "lat": 42.07534, "lng": -71.26039, "geo": "address"}, {"n": "35", "c": "Hingham", "s": "MA", "a": "South Shore / Attleboro", "lat": 42.24734, "lng": -70.92364, "geo": "store-name"}, {"n": "7", "c": "Mansfield", "s": "MA", "a": "South Shore / Attleboro", "lat": 42.03291, "lng": -71.23667, "geo": "address"}, {"n": "490", "c": "North Attleboro", "s": "MA", "a": "South Shore / Attleboro", "lat": 41.97213, "lng": -71.33311, "geo": "address"}, {"n": "28", "c": "Norwell", "s": "MA", "a": "South Shore / Attleboro", "lat": 42.15787, "lng": -70.85368, "geo": "address"}, {"n": "462", "c": "Plainville", "s": "MA", "a": "South Shore / Attleboro", "lat": 42.03529, "lng": -71.31134, "geo": "address"}, {"n": "2404", "c": "Seekonk", "s": "MA", "a": "South Shore / Attleboro", "lat": 41.88729, "lng": -71.33154, "geo": "address"}, {"n": "33", "c": "Stoughton", "s": "MA", "a": "South Shore / Attleboro", "lat": 42.13846, "lng": -71.10002, "geo": "address"}, {"n": "44", "c": "Walpole", "s": "MA", "a": "South Shore / Attleboro", "lat": 42.15656, "lng": -71.2418, "geo": "store-name"}, {"n": "444", "c": "Whitman", "s": "MA", "a": "South Shore / Attleboro", "lat": 42.07409, "lng": -70.94609, "geo": "address"}];
+const API='https://extendsclass.com/api/json-storage/bin/'+BIN;
+const SUPS=['Janine Richardson','Eduardo Ednardo','Alan','David'];
+// Checklist config: add client-facing items here later.
+const SECTIONS=[
+ {t:'Delivery & setup',items:[['pads','Pads delivered'],['supplies','Supplies dropped off'],['machines','Machines checked']]},
+ {t:'On site',items:[['on_pm','On site this afternoon'],['on_night','On site later tonight']]},
+ {t:'Training',items:[['ivr','IVR training done'],['mtrain','Machine training done'],['sow','Scope of work training done'],['uniform','Uniform training done']]},
+ {t:'Equipment on site',items:[['e_buffer','Buffer'],['e_propane','Propane'],['e_chem','Chemicals'],['e_pads','Pads'],['e_mops','Dry mops'],['e_tools','Tools']]}];
+const ALL=SECTIONS.flatMap(s=>s.items);
+let DB={stores:{}},me=localStorage.getItem('ssaa_sup')||'',filt='all',open=null,markers={};
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const tm=t=>t?new Date(t).toLocaleString('en-US',{hour:'numeric',minute:'2-digit',month:'short',day:'numeric'}):'';
+const sd=n=>DB.stores&&DB.stores[n]||{};const tonight=n=>!(sd(n).tonight&&sd(n).tonight.v===false);
+const pr=n=>{const d=sd(n);let k=0;ALL.forEach(([id])=>{if(d[id]&&d[id].v)k++});return k};
+function toast(m){const e=document.getElementById('toast');e.textContent=m;e.classList.add('s');setTimeout(()=>e.classList.remove('s'),1600)}
+async function load(){try{const r=await fetch(API+'?_='+Date.now(),{cache:'no-store'});DB=await r.json();if(!DB.stores)DB.stores={};document.getElementById('upd').textContent='Live · updated '+new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',second:'2-digit'});render()}catch(e){document.getElementById('upd').textContent='Reconnecting…'}}
+async function setF(n,f,v){if(!EDIT)return;if(!me){toast('Tap your name first');return}
+ const val={v,by:me,t:Date.now()};DB.stores[n]=DB.stores[n]||{};DB.stores[n][f]=val;render();
+ try{const r=await fetch(API,{method:'PATCH',headers:{'Content-Type':'application/merge-patch+json','Security-key':KEY},body:JSON.stringify({stores:{[n]:{[f]:val}}})});const j=await r.json();if(j.status!==0)throw 0;toast('Saved')}catch(e){toast('Save failed — retry')}}
+function who(){const w=document.getElementById('who');if(!w)return;w.innerHTML='<div class="sec" style="margin-top:0">I am</div><div class="row">'+SUPS.map(s=>`<button class="pill ${s===me?'on':''}" onclick="pick('${s}')">${esc(s)}</button>`).join('')+'</div>'}
+function pick(s){me=s;localStorage.setItem('ssaa_sup',s);who();render();toast('Signed as '+s)}
+function render(){
+ const T=STORES.filter(s=>tonight(s.n));const tot=T.length*ALL.length;const done=T.reduce((a,s)=>a+pr(s.n),0);
+ sT.textContent=T.length+' / '+STORES.length;sR.textContent=T.filter(s=>pr(s.n)===ALL.length).length;sP.textContent=(tot?Math.round(done/tot*100):0)+'%';sB.style.width=(tot?done/tot*100:0)+'%';
+ const fl=[['all','All 34'],['Cape Cod & Islands','Cape Cod & Islands'],['South Shore / Attleboro','South Shore / Attleboro'],['open','Not complete']];if(EDIT)fl.push(['mine','My entries']);
+ flt.innerHTML=fl.map(([k,l])=>`<button class="pill ${filt===k?'on':''}" onclick="filt='${k}';render()">${l}</button>`).join('');
+ const q=document.getElementById('q').value.toLowerCase();
+ const L=STORES.filter(s=>(!q||(s.n+' '+s.c).toLowerCase().includes(q))&&(filt==='all'||s.a===filt||(filt==='open'&&pr(s.n)<ALL.length)||(filt==='mine'&&Object.values(sd(s.n)).some(x=>x&&x.by===me))));
+ list.innerHTML=L.map(s=>{const p=pr(s.n),pc=Math.round(p/ALL.length*100),d=sd(s.n),note=d.note&&d.note.v;return `<div class="card store" onclick="det('${s.n}')"><div class="row" style="justify-content:space-between"><h3>#${s.n} · ${esc(s.c)}, ${s.s}</h3>${tonight(s.n)?`<span class="tag ${p===ALL.length?'g':''}">${p}/${ALL.length}</span>`:'<span class="tag r">Not tonight</span>'}</div><div class="meta" style="margin:4px 0 8px">${s.a}${s.geo==='approx'?' · pin approx.':''}</div><div class="bar"><i style="width:${pc}%"></i></div>${note?`<div class="meta" style="margin-top:8px;color:#b45309">⚠ ${esc(note)}</div>`:''}</div>`}).join('');
+ STORES.forEach(s=>{const p=pr(s.n),c=!tonight(s.n)?'#94a3b8':p===ALL.length?'#16a34a':p>0?'#f59e0b':'#e11d2e';markers[s.n]&&markers[s.n].setStyle({fillColor:c})});
+ if(typeof tbl!=='undefined'&&document.getElementById('tb'))document.getElementById('tb').innerHTML=STORES.map(s=>{const d=sd(s.n);return `<tr><td><b>#${s.n}</b><br><span class="meta">${esc(s.c)}</span></td><td>${tonight(s.n)?'Yes':'No'}</td><td>${pr(s.n)}/${ALL.length}</td>`+ALL.map(([id])=>{const x=d[id];return `<td title="${x?esc(x.by+' '+tm(x.t)):''}"><span class="dot ${x&&x.v?'on':''}"></span>${x&&x.v?`<div class="meta" style="font-size:10.5px">${esc(x.by.split(' ')[0])}<br>${tm(x.t).split(', ').pop()}</div>`:''}</td>`}).join('')+`<td>${esc(d.note&&d.note.v||'')}</td></tr>`}).join('');
+ if(open)det(open,true)}
+function det(n,re){open=n;const s=STORES.find(x=>x.n===n),d=sd(n);const ae=document.activeElement;if(re&&ae&&ae.id==='note')return;
+ let h=`<button class="x" onclick="cls()">×</button><h2 style="margin:0 0 2px;letter-spacing:-.02em">#${s.n} · ${esc(s.c)}, ${s.s}</h2><div class="meta">${s.a} · ${pr(n)}/${ALL.length} complete</div>`;
+ const tn=d.tonight;h+=`<div class="item"><div><b>Starts tonight</b><div class="w">${tn?esc(tn.by)+' · '+tm(tn.t):'Default: yes'}</div></div>${EDIT?`<input type="checkbox" class="chk" ${tonight(n)?'checked':''} onchange="setF('${n}','tonight',this.checked)">`:`<span class="tag ${tonight(n)?'g':'r'}">${tonight(n)?'Yes':'No'}</span>`}</div>`;
+ SECTIONS.forEach(sec=>{h+=`<div class="sec">${sec.t}</div>`;sec.items.forEach(([id,l])=>{const x=d[id];h+=`<div class="item"><div><b style="font-weight:600">${l}</b><div class="w">${x?(x.v?'✓ ':'Unchecked · ')+esc(x.by)+' · '+tm(x.t):'—'}</div></div>${EDIT?`<input type="checkbox" class="chk" ${x&&x.v?'checked':''} onchange="setF('${n}','${id}',this.checked)">`:`<span class="dot ${x&&x.v?'on':''}"></span>`}</div>`})});
+ const nt=d.note;h+=`<div class="sec">Missing / not on site</div>`+(EDIT?`<textarea id="note" rows="3" placeholder="What's missing or not on site?">${esc(nt&&nt.v||'')}</textarea><button class="pill on" style="margin-top:8px" onclick="setF('${n}','note',document.getElementById('note').value)">Save note</button>`:`<div>${esc(nt&&nt.v||'No notes')}</div>`)+(nt?`<div class="w meta">${esc(nt.by)} · ${tm(nt.t)}</div>`:'');
+ sheet.innerHTML=h;modal.style.display='flex'}
+function cls(){open=null;modal.style.display='none'}modal.onclick=e=>{if(e.target===modal)cls()};
+document.getElementById('q').oninput=render;
+const map=L.map('map',{scrollWheelZoom:false}).setView([41.85,-70.7],9);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',maxZoom:18}).addTo(map);
+STORES.forEach(s=>{markers[s.n]=L.circleMarker([s.lat,s.lng],{radius:8,weight:2,color:'#fff',fillColor:'#e11d2e',fillOpacity:1}).addTo(map).bindTooltip('#'+s.n+' '+s.c,{permanent:true,direction:'right',className:'lbl',offset:[8,0]}).on('click',()=>det(s.n))});
+map.fitBounds(STORES.map(s=>[s.lat,s.lng]),{padding:[20,20]});
+who();load();setInterval(load,EDIT?8000:5000);
+</script></body></html>
